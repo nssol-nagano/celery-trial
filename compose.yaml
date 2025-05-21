@@ -1,0 +1,40 @@
+services:
+  redis:
+    image: redis:7
+    volumes:
+      - ./redis_data:/data
+    networks:
+      - custom-network
+
+  celery:
+    build:
+      context: .
+      dockerfile: celery.dockerfile
+    depends_on:
+      - redis
+    networks:
+      - custom-network
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: fastapi.dockerfile
+    ports:
+      - 8000:8000
+    networks:
+      - custom-network
+
+  flower:
+    image: mher/flower
+    depends_on:
+      - redis
+      - celery
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    ports:
+      - 5555:5555
+    networks:
+      - custom-network
+
+networks:
+  custom-network:
