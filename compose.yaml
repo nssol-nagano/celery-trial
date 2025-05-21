@@ -19,6 +19,9 @@ services:
     build:
       context: .
       dockerfile: fastapi.dockerfile
+    depends_on:
+      - redis
+      - celery
     ports:
       - 8000:8000
     networks:
